@@ -36,8 +36,14 @@ BOARD_HOLES = [(-21.0, FRONT_Y), (21.0, FRONT_Y), (-21.5, REAR_Y), (21.5, REAR_Y
 BOSS_D = 7.0             # 基板を留めるボスの径
 TAP_D = 2.6              # M3 タッピングねじの下穴
 TAP_DEPTH = 10.0
-SKID_R = 4.0             # すべり材（半球）の半径
-SKID_GAP = 0.5           # すべり材と床のすき間（ホイールに重さをかけるため）
+KAGU_T = 1.5             # カグスベール（ニチアス）の厚さ 約 1.5 mm（KOGUMA-Mk4 と同じ。実物を測る）
+KAGU_GAP = 0.5           # カグスベールと床のすき間（ホイールに重さをかけるため）
+KAGU_D = 8.0             # カグスベールを切る直径
+PAD_D = 10.0             # カグスベールを貼る台の直径
+PAD_Z = KAGU_GAP + KAGU_T  # 台の下面の高さ 2.0 mm
+PAD_Y = (45.0, -47.0)    # 前後の接地点（車軸から）
+ARM_W = 10.0             # 前後に伸ばす腕の幅
+ARM_TOP = 9.0            # 腕の上面の高さ（センサ基板の下端 約 18.5 mm より低く）
 
 
 def wall(side):
@@ -76,11 +82,13 @@ def boss(x, y):
     return b.cut(hole)
 
 
-def skid(y):
-    z = SKID_GAP + SKID_R
-    ball = cq.Workplane('XY').sphere(SKID_R).translate((0, y, z))
-    post = cq.Workplane('XY').circle(SKID_R).extrude(BAR_Z[0] - z + 1).translate((0, y, z))
-    return ball.union(post)
+def pad_arm(y_bar, y_pad):
+    """前後のはりから接地点まで腕を伸ばし、先にカグスベールを貼る台を付ける。"""
+    y0, y1 = sorted((y_bar, y_pad + (PAD_D / 2 if y_pad > 0 else -PAD_D / 2)))
+    arm = (cq.Workplane('XY').box(ARM_W, y1 - y0, ARM_TOP - GROUND, centered=(True, False, False))
+           .translate((0, y0, GROUND)))
+    pad = cq.Workplane('XY').circle(PAD_D / 2).extrude(ARM_TOP - PAD_Z).translate((0, y_pad, PAD_Z))
+    return arm.union(pad)
 
 
 def chassis():
@@ -91,7 +99,7 @@ def chassis():
     for (x, y) in BOARD_HOLES:
         # ボスがはりに乗るように、はりの範囲に入れる
         c = c.union(boss(x, y))
-    c = c.union(skid(WALL_Y[1] - BAR_T / 2)).union(skid(WALL_Y[0] + BAR_T / 2))
+    c = c.union(pad_arm(WALL_Y[1] - BAR_T / 2, PAD_Y[0])).union(pad_arm(WALL_Y[0] + BAR_T / 2, PAD_Y[1]))
     return c
 
 
