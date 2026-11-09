@@ -10,17 +10,18 @@ import cadquery as cq
 OUT = sys.argv[1] if len(sys.argv) > 1 else '.'
 
 # ---- 機体の寸法（make_assembly.py と合わせる）
-AXLE_Z = 25.0            # 車軸の高さ（ホイール直径 50 mm）
+GROUND = 2.5             # 車高: 床からモータの底面まで
+AXLE_Z = GROUND + 21.0   # 車軸の高さ 23.5 mm（ホイール直径 47 mm）
 MOTOR = 42.0             # モータ 42 mm 角
 MOTOR_L = 17.0           # モータ本体の長さ
 GAP = 1.0                # 左右のモータの後端のすき間
 FACE_X = GAP / 2 + MOTOR_L          # モータ取付面の位置 |X| = 17.5
-BOARD_Z = AXLE_Z + MOTOR / 2 + 4.0  # メイン基板の下面 = 50（モータ上面との間 4 mm、足のはみ出し用）
+BOARD_Z = AXLE_Z + MOTOR / 2 + 4.0  # メイン基板の下面 = 48.5（モータ上面との間 4 mm、足のはみ出し用）
 
 # ---- シャーシの寸法
 WALL_T = 3.0             # モータ取付壁の厚さ
 WALL_Y = (-43.5, 31.0)   # 取付壁の前後の範囲
-WALL_Z = (4.5, 44.0)     # 取付壁の高さの範囲
+WALL_Z = (GROUND, AXLE_Z + 19.0)  # 取付壁の高さの範囲（下端は車高にそろえる）
 PILOT_HOLE = 22.4        # インロー φ22 の穴（すき間 0.2 mm）
 M3_CLEAR = 3.4           # M3 のバカ穴
 M3_HEAD = 6.0            # M3 なべ（低頭）ねじの頭の座ぐり径
@@ -28,7 +29,7 @@ M3_HEAD_DEPTH = 1.2
 MOTOR_HOLES = [(15.5, 15.5), (-15.5, -15.5)]   # モータの M3 穴（ピッチ 31 mm の対角、要確認）
 BAR_T = 4.0              # 前後のはりの厚さ
 BAR_X = 24.0             # はりの左右の端 |X|
-BAR_Z = (4.5, 40.0)     # 上端を基板の 10 mm 下に（部品の足をよける）
+BAR_Z = (GROUND, BOARD_Z - 10.0)  # 上端を基板の 10 mm 下に（部品の足をよける）
 FRONT_Y = 29.0           # 前のはり（メイン基板の取付穴 H1/H2 の位置）
 REAR_Y = -41.5           # 後ろのはり（H3/H4）
 BOARD_HOLES = [(-21.0, FRONT_Y), (21.0, FRONT_Y), (-21.5, REAR_Y), (21.5, REAR_Y)]

@@ -15,14 +15,14 @@ import make_chassis  # noqa: E402
 SP = sys.argv[1]
 OUT = sys.argv[2]
 
-WHEEL_D, WHEEL_W = 50.0, 6.0          # ホイール径（O リング込み）と幅（案）
+WHEEL_D, WHEEL_W = 47.0, 6.0          # ホイール径（O リング込み、車高 2.5 mm になる径）と幅（案）
 AXLE_Z = WHEEL_D / 2
 MOTOR = 42.0                          # PKP242D23A2: 42 mm 角
 MOTOR_L = 17.0                        # 本体長さ（取付面から後端）
 GAP = 1.0                             # 左右モータの後端どうしのすき間
 PILOT_D, PILOT_H = 22.0, 1.5          # インロー
 SHAFT_D, SHAFT_L = 5.0, 15.0
-BOARD_Z = AXLE_Z + MOTOR / 2 + 4.0    # メイン基板の下面 = 50（モータ上面との間 4 mm、部品の足のはみ出し用）
+BOARD_Z = AXLE_Z + MOTOR / 2 + 4.0    # メイン基板の下面 = 48.5（モータ上面との間 4 mm、部品の足のはみ出し用）
 PCB_T = 1.6
 SOCKET_H = 8.5                        # ピンソケットの高さ
 TAB_OUT = 0.9                         # センサ基板の差し込み部がメイン基板の上に出る長さ
