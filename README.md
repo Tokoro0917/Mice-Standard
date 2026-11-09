@@ -31,7 +31,7 @@
 | マイコン | NUCLEO-L432KC |
 | モータドライバ | MP6500 モジュール ×2 |
 | センサ | 赤外 LED + フォトトランジスタ ×4 組 |
-| 電源 | LiPo 3 セル（NUCLEO へはダイオード 2 本を通して VIN に給電） |
+| 電源 | LiPo 3 セル、P-ch MOSFET で逆接続保護、9 V LDO で NUCLEO の VIN に給電 |
 | 寸法・重量 | TBD |
 
 詳しくは [仕様書](docs/spec.md) を参照してください。
