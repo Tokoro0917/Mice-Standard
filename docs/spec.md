@@ -220,7 +220,7 @@ GPIO ── Rb 100 Ω ── B   NPN トランジスタ SS8050-D
 LiPo 3 セル ─ XT30 ─ ヒューズ ─ P-ch MOSFET ─ 電源スイッチ ─┬─ VMOT ×2（各 100 µF / 25 V 電解コンデンサ）
                                                               ├─ 赤外 LED 駆動回路
                                                               ├─ 分圧回路 → VBAT_SENSE
-                                                              └─ 9 V LDO BA09CC0T → NUCLEO VIN
+                                                              └─ 9 V LDO BA90DD0T → NUCLEO VIN
 ```
 
 | 部品 | 案 | 理由 |
