@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "Mice-Standard")(type "KiCad")(uri "${KIPRJMOD}/../lib/Mice-Standard.pretty")(options "")(descr "Mice-Standard 自作フットプリント"))
+)
