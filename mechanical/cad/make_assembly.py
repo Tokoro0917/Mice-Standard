@@ -5,7 +5,12 @@ World frame: X = right, Y = forward, Z = up, origin = floor under the axle centr
 import math
 import sys
 
+import os
+
 import cadquery as cq
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import make_chassis  # noqa: E402
 
 SP = sys.argv[1]
 OUT = sys.argv[2]
@@ -17,7 +22,7 @@ MOTOR_L = 17.0                        # 本体長さ（取付面から後端）
 GAP = 1.0                             # 左右モータの後端どうしのすき間
 PILOT_D, PILOT_H = 22.0, 1.5          # インロー
 SHAFT_D, SHAFT_L = 5.0, 15.0
-BOARD_Z = AXLE_Z + MOTOR / 2 + 2.0    # メイン基板の下面（モータ上面 + 3D プリントの台 2 mm）
+BOARD_Z = AXLE_Z + MOTOR / 2 + 4.0    # メイン基板の下面 = 50（モータ上面との間 4 mm、部品の足のはみ出し用）
 PCB_T = 1.6
 SOCKET_H = 8.5                        # ピンソケットの高さ
 TAB_OUT = 0.9                         # センサ基板の差し込み部がメイン基板の上に出る長さ
@@ -78,6 +83,7 @@ sens = cq.importers.importStep(SP + '/sensor.step')
 
 asm = cq.Assembly(name='Mice-Standard')
 asm.add(main_pcb, name='main-board', color=cq.Color(0.1, 0.45, 0.2))
+asm.add(make_chassis.chassis(), name='chassis (PLA)', color=cq.Color(0.95, 0.6, 0.1))
 for side in ('L', 'R'):
     body, shaft, face = motor(side)
     asm.add(body, name='motor_' + side, color=cq.Color(0.25, 0.25, 0.28))
