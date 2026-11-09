@@ -89,8 +89,8 @@ for side in ('L', 'R'):
     asm.add(body, name='motor_' + side, color=cq.Color(0.25, 0.25, 0.28))
     asm.add(shaft, name='shaft_' + side, color=cq.Color(0.8, 0.8, 0.8))
     asm.add(wheel(side, face), name='wheel_' + side, color=cq.Color(0.9, 0.9, 0.9))
-SLOTS = {'J11_LF': ((6.0, 6.0), 7.0), 'J12_RF': ((62.0, 6.0), -7.0),
-         'J10_LS': ((19.0, 7.5), -65.3), 'J13_RS': ((49.0, 7.5), 65.3)}
+SLOTS = {'J11_LF': ((8.0, 6.0), 7.0), 'J12_RF': ((60.0, 6.0), -7.0),
+         'J10_LS': ((6.5, 16.0), 46.3), 'J13_RS': ((61.5, 16.0), -46.3)}
 for name, (xy, r) in SLOTS.items():
     asm.add(sensor(xy, r, sens), name='sensor_' + name, color=cq.Color(0.1, 0.45, 0.2))
 # 差し込み式モジュールの仮の形（実寸の外形のみ）
