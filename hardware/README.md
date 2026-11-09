@@ -4,7 +4,8 @@ KiCad の回路図・基板データです。
 
 | ディレクトリ | 内容 |
 | --- | --- |
-| `main-board/` | KiCad プロジェクト（`.kicad_pro`, `.kicad_sch`, `.kicad_pcb`） |
+| `main-board/` | メイン基板の KiCad プロジェクト（NUCLEO、モータドライバ、電源など） |
+| `sensor-board/` | センサ基板の KiCad プロジェクト（壁センサ）。メイン基板に垂直に取り付ける |
 | `lib/` | 標準機で使うシンボル・フットプリント・3D モデル |
 | `production/` | 発注用データ（ガーバー、BOM、部品配置）。リリースごとに更新 |
 
