@@ -29,7 +29,7 @@ TAB_OUT = 0.9                         # センサ基板の差し込み部がメ�
 
 # メイン基板の座標 (KiCad の x, y) → 世界座標
 def board_xy(x, y):
-    return (x - 34.0, 55.0 - y)   # 基板 v0.2: 幅 68 mm、中心 x = 34
+    return (x - 40.0, 55.0 - y)   # 基板 v0.3: 幅 80 mm、中心 x = 40
 
 
 def motor(side):
@@ -89,15 +89,15 @@ for side in ('L', 'R'):
     asm.add(body, name='motor_' + side, color=cq.Color(0.25, 0.25, 0.28))
     asm.add(shaft, name='shaft_' + side, color=cq.Color(0.8, 0.8, 0.8))
     asm.add(wheel(side, face), name='wheel_' + side, color=cq.Color(0.9, 0.9, 0.9))
-SLOTS = {'J11_LF': ((8.0, 6.0), 7.0), 'J12_RF': ((60.0, 6.0), -7.0),
-         'J10_LS': ((6.5, 16.0), 46.3), 'J13_RS': ((61.5, 16.0), -46.3)}
+SLOTS = {'J11_LF': ((11.0, 6.0), 7.0), 'J12_RF': ((69.0, 6.0), -7.0),
+         'J10_LS': ((9.5, 16.0), 44.7), 'J13_RS': ((70.5, 16.0), -44.7)}
 for name, (xy, r) in SLOTS.items():
     asm.add(sensor(xy, r, sens), name='sensor_' + name, color=cq.Color(0.1, 0.45, 0.2))
 # 差し込み式モジュールの仮の形（実寸の外形のみ）
 top = BOARD_Z + PCB_T + SOCKET_H
-asm.add(box(18.5, 50.3, 1.6, *board_xy(34.0, 31 + 17.78), top), name='NUCLEO-L432KC (仮)',
+asm.add(box(18.5, 50.3, 1.6, *board_xy(40.0, 31 + 17.78), top), name='NUCLEO-L432KC (仮)',
         color=cq.Color(0.95, 0.95, 0.95))
-for side, x in (('L', 16.35), ('R', 51.65)):
+for side, x in (('L', 22.35), ('R', 57.65)):
     asm.add(box(15.24, 20.32, 1.6, *board_xy(x, 71 + 8.89), top), name='MP6500_' + side + ' (仮)',
             color=cq.Color(0.8, 0.1, 0.1))
 # 電池（Zeee 3S 850 mAh、67 x 18.5 x 30 mm を立てて載せる）
