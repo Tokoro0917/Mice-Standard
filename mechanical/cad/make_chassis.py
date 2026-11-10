@@ -18,10 +18,16 @@ GAP = 1.0                # 左右のモータの後端のすき間
 FACE_X = GAP / 2 + MOTOR_L          # モータ取付面の位置 |X| = 17.5
 BOARD_Z = AXLE_Z + MOTOR / 2 + 4.0  # メイン基板の下面 = 48.5（モータ上面との間 4 mm、足のはみ出し用）
 
+# ---- カグスベール（接地点）
+KAGU_T = 1.5             # カグスベール（ニチアス）の厚さ 約 1.5 mm（KOGUMA-Mk4 と同じ。実物を測る）
+KAGU_GAP = 0.5           # カグスベールと床のすき間（ホイールに重さをかけるため）
+KAGU_D = 8.0             # カグスベールを切る直径
+BASE = KAGU_GAP + KAGU_T  # シャーシの下面 = 2.0 mm（ここが印刷のベッド面。接地点の台もこの面）
+
 # ---- シャーシの寸法
 WALL_T = 3.0             # モータ取付壁の厚さ
 WALL_Y = (-43.5, 31.0)   # 取付壁の前後の範囲
-WALL_Z = (GROUND, AXLE_Z + 19.0)  # 取付壁の高さの範囲（下端は車高にそろえる）
+WALL_Z = (BASE, AXLE_Z + 19.0)  # 取付壁の高さの範囲
 PILOT_HOLE = 22.4        # インロー φ22 の穴（すき間 0.2 mm）
 M3_CLEAR = 3.4           # M3 のバカ穴
 M3_HEAD = 6.0            # M3 なべ（低頭）ねじの頭の座ぐり径
@@ -29,21 +35,27 @@ M3_HEAD_DEPTH = 1.2
 MOTOR_HOLES = [(15.5, 15.5), (-15.5, -15.5)]   # モータの M3 穴（ピッチ 31 mm の対角、要確認）
 BAR_T = 4.0              # 前後のはりの厚さ
 BAR_X = 24.0             # はりの左右の端 |X|
-BAR_Z = (GROUND, BOARD_Z - 10.0)  # 上端を基板の 10 mm 下に（部品の足をよける）
+BAR_Z = (BASE, BOARD_Z - 10.0)  # 上端を基板の 10 mm 下に（部品の足をよける）
 FRONT_Y = 29.0           # 前のはり（メイン基板の取付穴 H1/H2 の位置）
 REAR_Y = -41.5           # 後ろのはり（H3/H4）
 BOARD_HOLES = [(-21.0, FRONT_Y), (21.0, FRONT_Y), (-21.5, REAR_Y), (21.5, REAR_Y)]
 BOSS_D = 7.0             # 基板を留めるボスの径
 TAP_D = 2.6              # M3 タッピングねじの下穴
 TAP_DEPTH = 10.0
-KAGU_T = 1.5             # カグスベール（ニチアス）の厚さ 約 1.5 mm（KOGUMA-Mk4 と同じ。実物を測る）
-KAGU_GAP = 0.5           # カグスベールと床のすき間（ホイールに重さをかけるため）
-KAGU_D = 8.0             # カグスベールを切る直径
-PAD_D = 10.0             # カグスベールを貼る台の直径
-PAD_Z = KAGU_GAP + KAGU_T  # 台の下面の高さ 2.0 mm
-PAD_Y = (45.0, -47.0)    # 前後の接地点（車軸から）
-ARM_W = 10.0             # 前後に伸ばす腕の幅
+PAD_D = 10.0             # 前の接地点の台の直径
+FRONT_PAD_Y = 45.0       # 前の接地点（車軸から）
+ARM_W = 10.0             # 前に伸ばす腕の幅
 ARM_TOP = 9.0            # 腕の上面の高さ（センサ基板の下端 約 18.5 mm より低く）
+
+# ---- 電池（Zeee 3S 850 mAh 100C、67 x 30 x 18.5 mm、74 g）を後ろに立てて載せる
+BATT = (67.0, 18.5, 30.0)  # 左右 x 前後 x 高さ（長い辺を左右に、立てる）
+TRAY_CLEAR = 0.5         # 電池のまわりのすき間
+TRAY_FLOOR = 1.5         # 床の厚さ
+TRAY_WALL = 2.0          # 後ろの壁・左右の壁の厚さ
+TRAY_BACK_H = 20.0       # 後ろの壁の高さ（床の上から）
+TRAY_SIDE_H = 6.0        # 左右の壁の高さ（線が出る側をふさがない）
+STRAP_W, STRAP_T = 12.0, 2.5   # 面ファスナーのバンドを通す穴
+REAR_PAD_Y = None        # 後ろの接地点は電池の台の下（下で決める）
 
 
 def wall(side):
@@ -82,13 +94,44 @@ def boss(x, y):
     return b.cut(hole)
 
 
-def pad_arm(y_bar, y_pad):
-    """前後のはりから接地点まで腕を伸ばし、先にカグスベールを貼る台を付ける。"""
-    y0, y1 = sorted((y_bar, y_pad + (PAD_D / 2 if y_pad > 0 else -PAD_D / 2)))
-    arm = (cq.Workplane('XY').box(ARM_W, y1 - y0, ARM_TOP - GROUND, centered=(True, False, False))
-           .translate((0, y0, GROUND)))
-    pad = cq.Workplane('XY').circle(PAD_D / 2).extrude(ARM_TOP - PAD_Z).translate((0, y_pad, PAD_Z))
+def front_arm(y_bar):
+    """前のはりから接地点まで腕を伸ばす。先の台の下面にカグスベールを貼る。"""
+    y1 = FRONT_PAD_Y + PAD_D / 2
+    arm = (cq.Workplane('XY').box(ARM_W, y1 - y_bar, ARM_TOP - BASE, centered=(True, False, False))
+           .translate((0, y_bar, BASE)))
+    pad = cq.Workplane('XY').circle(PAD_D / 2).extrude(ARM_TOP - BASE).translate((0, FRONT_PAD_Y, BASE))
     return arm.union(pad)
+
+
+def tray_dims():
+    y_front = WALL_Y[0]                               # 後ろのはりの後ろの面（床はここからつなぐ）
+    y_batt = REAR_Y - BOSS_D / 2 - TRAY_CLEAR         # 電池の前の面（基板のボスをよける）
+    y_back_in = y_batt - BATT[1] - TRAY_CLEAR         # 電池の後ろの面
+    x_in = BATT[0] / 2 + TRAY_CLEAR
+    return y_front, y_back_in, x_in
+
+
+def battery_tray():
+    """後ろのはりの後ろに、電池を立てて置く台。面ファスナーのバンドで留める。"""
+    y_front, y_back_in, x_in = tray_dims()
+    y_back = y_back_in - TRAY_WALL
+    x_out = x_in + TRAY_WALL
+    floor = (cq.Workplane('XY').box(2 * x_out, y_front - y_back, TRAY_FLOOR, centered=(True, False, False))
+             .translate((0, y_back, BASE)))
+    back = (cq.Workplane('XY').box(2 * x_out, TRAY_WALL, TRAY_FLOOR + TRAY_BACK_H, centered=(True, False, False))
+            .translate((0, y_back, BASE)))
+    sides = None
+    for sx in (-1, 1):
+        w = (cq.Workplane('XY').box(TRAY_WALL, y_front - y_back, TRAY_FLOOR + TRAY_SIDE_H, centered=(False, False, False))
+             .translate((sx * x_in if sx > 0 else -x_out, y_back, BASE)))
+        sides = w if sides is None else sides.union(w)
+    t = floor.union(back).union(sides)
+    # バンドを通す穴（左右 2 か所、床の真ん中）
+    for sx in (-1, 1):
+        slot = (cq.Workplane('XY').box(STRAP_T, STRAP_W, TRAY_FLOOR + 2, centered=True)
+                .translate((sx * (x_in - 8), (y_front + y_back_in) / 2, BASE + TRAY_FLOOR / 2)))
+        t = t.cut(slot)
+    return t
 
 
 def chassis():
@@ -99,7 +142,7 @@ def chassis():
     for (x, y) in BOARD_HOLES:
         # ボスがはりに乗るように、はりの範囲に入れる
         c = c.union(boss(x, y))
-    c = c.union(pad_arm(WALL_Y[1] - BAR_T / 2, PAD_Y[0])).union(pad_arm(WALL_Y[0] + BAR_T / 2, PAD_Y[1]))
+    c = c.union(front_arm(WALL_Y[1] - BAR_T / 2)).union(battery_tray())
     return c
 
 

@@ -100,7 +100,40 @@ asm.add(box(18.5, 50.3, 1.6, *board_xy(34.0, 31 + 17.78), top), name='NUCLEO-L43
 for side, x in (('L', 16.35), ('R', 51.65)):
     asm.add(box(15.24, 20.32, 1.6, *board_xy(x, 71 + 8.89), top), name='MP6500_' + side + ' (仮)',
             color=cq.Color(0.8, 0.1, 0.1))
+# 電池（Zeee 3S 850 mAh、67 x 18.5 x 30 mm を立てて載せる）
+_yf, _yb, _xi = make_chassis.tray_dims()
+_bz = make_chassis.BASE + make_chassis.TRAY_FLOOR
+asm.add(box(make_chassis.BATT[0], make_chassis.BATT[1], make_chassis.BATT[2], 0, _yb + make_chassis.BATT[1] / 2, _bz),
+        name='battery 3S 850mAh', color=cq.Color(0.15, 0.15, 0.15))
 asm.save(OUT, exportType='STEP')
+
+# 重心の見積もり（重さは仮。実物を量って直す）
+MASS = {  # 名前: (g, (X, Y, Z))
+    'motor x2': (220, (0, 0, AXLE_Z)),
+    'wheel x2 (O リング込み)': (12, (0, 0, AXLE_Z)),
+    'chassis (PLA 30 %)': (20, (0, -15, 15)),
+    'main board + parts': (45, (0, 5, BOARD_Z + 5)),
+    'NUCLEO + MP6500 x2': (16, (0, -10, BOARD_Z + 12)),
+    'sensor boards x4': (8, (0, 47, BOARD_Z - 15)),
+    'battery': (74, (0, _yb + make_chassis.BATT[1] / 2, _bz + make_chassis.BATT[2] / 2)),
+}
+tot = sum(m for m, _ in MASS.values())
+cg = [sum(m * p[i] for m, p in MASS.values()) / tot for i in range(3)]
+print('mass about %d g, CG X %.1f Y %.1f Z %.1f (mm, from axle / floor)' % (tot, *cg))
+# その場旋回で一番外を回る点（車軸の中心から）
+import math as _m
+far = 0
+for _n, _o in asm.objects.items():
+    if _o.obj is None:
+        continue
+    _sh = _o.obj.val() if hasattr(_o.obj, 'val') else _o.obj
+    if _o.loc is not None:
+        _sh = _sh.moved(_o.loc)
+    _b = _sh.BoundingBox()
+    for _x in (_b.xmin, _b.xmax):
+        for _y in (_b.ymin, _b.ymax):
+            far = max(far, _m.hypot(_x, _y))
+print('turning radius (bbox corners) %.1f mm (wall at 84 mm from cell centre)' % far)
 
 # 寸法の確認
 bb = asm.toCompound().BoundingBox()
