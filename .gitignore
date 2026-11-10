@@ -1,0 +1,28 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# KiCad
+*.kicad_prl
+*-backups/
+fp-info-cache
+_autosave-*
+*.lck
+\#auto_saved_files\#
+
+# STM32 / CMake build
+firmware/build/
+firmware/Debug/
+firmware/Release/
+*.o
+*.d
+*.elf
+*.map
+*.list
+
+# VS Code（共有したい設定は個別に追加）
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
